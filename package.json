@@ -1,6 +1,6 @@
 {
   "name": "@fmzu/prefecture",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,9 +15,7 @@
   "main": "dist/index.umd.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -26,8 +24,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "wanakana": "^5.3.1"
   }
 }

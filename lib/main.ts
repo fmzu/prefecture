@@ -1,4 +1,103 @@
-const prefectureMap = new Map([
+type Value =
+  | "HOKKAIDO"
+  | "AOMORI"
+  | "IWATE"
+  | "MIYAGI"
+  | "AKITA"
+  | "YAMAGATA"
+  | "FUKUSHIMA"
+  | "IBARAKI"
+  | "TOCHIGI"
+  | "GUNMA"
+  | "SAITAMA"
+  | "CHIBA"
+  | "TOKYO"
+  | "KANAGAWA"
+  | "NIIGATA"
+  | "TOYAMA"
+  | "ISHIKAWA"
+  | "FUKUI"
+  | "YAMANASHI"
+  | "NAGANO"
+  | "GIFU"
+  | "SHIZUOKA"
+  | "AICHI"
+  | "MIE"
+  | "SHIGA"
+  | "KYOTO"
+  | "OSAKA"
+  | "HYOGO"
+  | "NARA"
+  | "WAKAYAMA"
+  | "TOTTORI"
+  | "SHIMANE"
+  | "OKAYAMA"
+  | "HIROSHIMA"
+  | "YAMAGUCHI"
+  | "TOKUSHIMA"
+  | "KAGAWA"
+  | "EHIME"
+  | "KOCHI"
+  | "FUKUOKA"
+  | "SAGA"
+  | "NAGASAKI"
+  | "KUMAMOTO"
+  | "OITA"
+  | "MIYAZAKI"
+  | "KAGOSHIMA"
+  | "OKINAWA"
+  | null
+
+type PrefectureNameJa =
+  | "北海道"
+  | "青森県"
+  | "岩手県"
+  | "宮城県"
+  | "秋田県"
+  | "山形県"
+  | "福島県"
+  | "茨城県"
+  | "栃木県"
+  | "群馬県"
+  | "埼玉県"
+  | "千葉県"
+  | "東京都"
+  | "神奈川県"
+  | "新潟県"
+  | "富山県"
+  | "石川県"
+  | "福井県"
+  | "山梨県"
+  | "長野県"
+  | "岐阜県"
+  | "静岡県"
+  | "愛知県"
+  | "三重県"
+  | "滋賀県"
+  | "京都府"
+  | "大阪府"
+  | "兵庫県"
+  | "奈良県"
+  | "和歌山県"
+  | "鳥取県"
+  | "島根県"
+  | "岡山県"
+  | "広島県"
+  | "山口県"
+  | "徳島県"
+  | "香川県"
+  | "愛媛県"
+  | "高知県"
+  | "福岡県"
+  | "佐賀県"
+  | "長崎県"
+  | "熊本県"
+  | "大分県"
+  | "宮崎県"
+  | "鹿児島県"
+  | "沖縄県"
+
+const prefectureMap = new Map<PrefectureNameJa, Value>([
   ["北海道", "HOKKAIDO"],
   ["青森県", "AOMORI"],
   ["岩手県", "IWATE"],
@@ -48,18 +147,57 @@ const prefectureMap = new Map([
   ["沖縄県", "OKINAWA"],
 ])
 
-export class Prefecture {
-  constructor(public name: string) {}
+const reversedPrefectureMap = new Map<Value, PrefectureNameJa>(
+  Array.from(prefectureMap, ([key, value]) => [value, key]),
+)
 
-  get value() {
-    return (
-      prefectureMap.get(this.name) ||
-      prefectureMap.get(`${this.name}都`) ||
-      prefectureMap.get(`${this.name}府`) ||
-      prefectureMap.get(`${this.name}県`) ||
+export class Prefecture {
+  constructor(public value: Value) {}
+
+  get nameJa() {
+    return reversedPrefectureMap.get(this.value)
+  }
+
+  static fromTextJa(text: string) {
+    const value =
+      prefectureMap.get(text as never) ||
+      prefectureMap.get(`${text}都` as never) ||
+      prefectureMap.get(`${text}府` as never) ||
+      prefectureMap.get(`${text}県` as never) ||
       null
-    )
+    if (value === null) {
+      return null
+    }
+    return new Prefecture(value)
+  }
+
+  static fromText(text: string) {
+    const value = reversedPrefectureMap.get(text as never)
+    if (value === undefined) {
+      return null
+    }
+    return new Prefecture(text as never)
+  }
+
+  /**
+   * 住所から都道府県を取得
+   * @param address 住所
+   * @returns
+   */
+  static fromAddress(address: string) {
+    if (address.includes("大阪")) {
+      return new Prefecture("OSAKA")
+    }
+    if (address.includes("京都")) {
+      return new Prefecture("KYOTO")
+    }
+    if (address.includes("東京")) {
+      return new Prefecture("TOKYO")
+    }
+    if (address.includes("北海道")) {
+      return new Prefecture("HOKKAIDO")
+    }
+    const value = address.split("県")[0]
+    return Prefecture.fromTextJa(value)
   }
 }
-
-console.log(new Prefecture("京都").value)
